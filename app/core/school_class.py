@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from app.database.database import Base
@@ -12,5 +13,10 @@ class SchoolClass(Base):
     name = Column(String, nullable=False)
     section = Column(String, nullable=False)
     room_number = Column(String, nullable=True)
+    batch_year = Column(String, nullable=False)
+
+    incharge_teacher_id = Column(Integer, ForeignKey("teachers.id"), nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    students = relationship("Student", back_populates="school_class")
