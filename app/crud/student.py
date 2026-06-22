@@ -1,12 +1,9 @@
 from sqlalchemy.orm import Session
 
 from app.core.student import Student
-from app.schema.student import StudentCreate,StudentUpdate
+from app.schema.student import StudentCreate, StudentUpdate
 
 
-
-
-# post student data 
 def create_student(db: Session, student: StudentCreate):
     db_student = Student(
         name=student.name,
@@ -14,7 +11,7 @@ def create_student(db: Session, student: StudentCreate):
         phone=student.phone,
         age=student.age,
         roll_number=student.roll_number,
-        class_name=student.class_name,
+        class_id=student.class_id,
         address=student.address
     )
 
@@ -25,17 +22,19 @@ def create_student(db: Session, student: StudentCreate):
     return db_student
 
 
-# get student data 
-def get_students(db:Session):
+def get_students(db: Session):
     return db.query(Student).all()
 
-# get particular student data 
-def get_student_by_id(db:Session,student_id:int):
-    return db.query(Student).filter(Student.id==student_id).first()
+
+def get_student_by_id(db: Session, student_id: int):
+    return db.query(Student).filter(Student.id == student_id).first()
 
 
-# put operation 
-def update_student_full(db: Session, student_id: int, student_data: StudentCreate):
+def update_student_full(
+    db: Session,
+    student_id: int,
+    student_data: StudentCreate
+):
     student = get_student_by_id(db, student_id)
 
     if student is None:
@@ -46,7 +45,7 @@ def update_student_full(db: Session, student_id: int, student_data: StudentCreat
     student.phone = student_data.phone
     student.age = student_data.age
     student.roll_number = student_data.roll_number
-    student.class_name = student_data.class_name
+    student.class_id = student_data.class_id
     student.address = student_data.address
 
     db.commit()
@@ -55,8 +54,11 @@ def update_student_full(db: Session, student_id: int, student_data: StudentCreat
     return student
 
 
-# patch operation 
-def update_student_partial(db: Session, student_id: int, student_data: StudentUpdate):
+def update_student_partial(
+    db: Session,
+    student_id: int,
+    student_data: StudentUpdate
+):
     student = get_student_by_id(db, student_id)
 
     if student is None:
@@ -75,7 +77,7 @@ def update_student_partial(db: Session, student_id: int, student_data: StudentUp
 
     return student
 
-# delete student by id 
+
 def delete_student(db: Session, student_id: int):
     student = get_student_by_id(db, student_id)
 

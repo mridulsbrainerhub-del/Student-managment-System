@@ -1,19 +1,19 @@
-from pydantic import BaseModel, EmailStr,Field
 from datetime import datetime
+from pydantic import BaseModel, EmailStr, Field
 
 
 class StudentBase(BaseModel):
     name: str
     email: EmailStr
     phone: str | None = Field(
-    default=None,
-    min_length=10,
-    max_length=10,
-    pattern=r"^\d+$"
-)
+        default=None,
+        min_length=10,
+        max_length=10,
+        pattern=r"^\d+$"
+    )
     age: int
     roll_number: str
-    class_name: str
+    class_id: int | None = None
     address: str | None = None
 
 
@@ -32,7 +32,7 @@ class StudentUpdate(BaseModel):
     )
     age: int | None = None
     roll_number: str | None = None
-    class_name: str | None = None
+    class_id: int | None = None
     address: str | None = None
 
 
