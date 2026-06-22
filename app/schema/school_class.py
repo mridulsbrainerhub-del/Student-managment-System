@@ -6,6 +6,8 @@ class SchoolClassBase(BaseModel):
     name: str
     section: str
     room_number: str | None = None
+    batch_year: str
+    incharge_teacher_id: int | None = None
 
 
 class SchoolClassCreate(SchoolClassBase):
@@ -16,6 +18,8 @@ class SchoolClassUpdate(BaseModel):
     name: str | None = None
     section: str | None = None
     room_number: str | None = None
+    batch_year: str | None = None
+    incharge_teacher_id: int | None = None
 
 
 class SchoolClassResponse(SchoolClassBase):
