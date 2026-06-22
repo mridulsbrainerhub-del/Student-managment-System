@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 
 from app.database.database import Base, engine
-from app.core import student,users,teacher
+from app.core import student,users,teacher,school_class
 
 from app.routers.student import router as student_router
 from app.routers.auth import router as auth_router
 from app.routers.teacher import router as teacher_router
+
 
 Base.metadata.create_all(bind=engine)
 
