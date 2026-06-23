@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-
+from uuid import UUID
 
 class SchoolClassBase(BaseModel):
     name: str
@@ -23,7 +23,7 @@ class SchoolClassUpdate(BaseModel):
 
 
 class SchoolClassResponse(SchoolClassBase):
-    id: int
+    id: UUID
     created_at: datetime
 
     class Config:

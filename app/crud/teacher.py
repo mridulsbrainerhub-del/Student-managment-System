@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
 from app.core.teacher import Teacher
@@ -24,11 +26,11 @@ def get_teachers(db: Session):
     return db.query(Teacher).all()
 
 
-def get_teacher_by_id(db: Session, teacher_id: int):
+def get_teacher_by_id(db: Session, teacher_id: UUID):
     return db.query(Teacher).filter(Teacher.id == teacher_id).first()
 
 
-def update_teacher_full(db: Session, teacher_id: int, teacher_data: TeacherCreate):
+def update_teacher_full(db: Session, teacher_id: UUID, teacher_data: TeacherCreate):
     teacher = get_teacher_by_id(db, teacher_id)
 
     if teacher is None:
@@ -46,7 +48,7 @@ def update_teacher_full(db: Session, teacher_id: int, teacher_data: TeacherCreat
     return teacher
 
 
-def update_teacher_partial(db: Session, teacher_id: int, teacher_data: TeacherUpdate):
+def update_teacher_partial(db: Session, teacher_id: UUID, teacher_data: TeacherUpdate):
     teacher = get_teacher_by_id(db, teacher_id)
 
     if teacher is None:
@@ -66,7 +68,7 @@ def update_teacher_partial(db: Session, teacher_id: int, teacher_data: TeacherUp
     return teacher
 
 
-def delete_teacher(db: Session, teacher_id: int):
+def delete_teacher(db: Session, teacher_id: UUID):
     teacher = get_teacher_by_id(db, teacher_id)
 
     if teacher is None:

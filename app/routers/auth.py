@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from app.database.database import get_db
 from app.schema.users import UserCreate, UserResponse,  Token

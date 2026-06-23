@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from app.database.database import get_db
 from app.schema.teacher import TeacherCreate, TeacherUpdate, TeacherResponse
@@ -39,7 +40,7 @@ def read_teachers(
 
 @router.get("/{teacher_id}", response_model=TeacherResponse)
 def read_teacher(
-    teacher_id: int,
+    teacher_id: UUID,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
@@ -53,7 +54,7 @@ def read_teacher(
 
 @router.put("/{teacher_id}", response_model=TeacherResponse)
 def update_teacher_put(
-    teacher_id: int,
+    teacher_id: UUID,
     teacher_data: TeacherCreate,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -68,7 +69,7 @@ def update_teacher_put(
 
 @router.patch("/{teacher_id}", response_model=TeacherResponse)
 def update_teacher_patch(
-    teacher_id: int,
+    teacher_id: UUID,
     teacher_data: TeacherUpdate,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -83,7 +84,7 @@ def update_teacher_patch(
 
 @router.delete("/{teacher_id}")
 def delete_teacher_route(
-    teacher_id: int,
+    teacher_id: UUID,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):

@@ -1,5 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime
+import uuid
 from datetime import datetime
+
+from sqlalchemy import Column, String, DateTime
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.database.database import Base
 
@@ -7,7 +10,7 @@ from app.database.database import Base
 class Teacher(Base):
     __tablename__ = "teachers"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)

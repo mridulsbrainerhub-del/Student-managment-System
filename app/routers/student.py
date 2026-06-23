@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends,HTTPException
 from sqlalchemy.orm import Session
-
+from uuid import UUID
 from app.database.database import get_db
 from app.schema.student import StudentCreate, StudentResponse,StudentUpdate
 from app.crud.student import create_student,get_students,get_student_by_id,update_student_full,update_student_partial,delete_student
@@ -39,7 +39,7 @@ def read_students(db: Session = Depends(get_db),current_user=Depends(get_current
 # endpoint for getting particular student data 
 @router.get("/{student_id}", response_model=StudentResponse)
 def read_student(
-    student_id: int,
+    student_id: UUID,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
@@ -55,7 +55,7 @@ def read_student(
 # updating data of student  
 @router.put("/{student_id}", response_model=StudentResponse)
 def update_student_put(
-    student_id: int,
+    student_id: UUID,
     student_data: StudentCreate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
@@ -71,7 +71,7 @@ def update_student_put(
 # updating particular data of the student 
 @router.patch("/{student_id}", response_model=StudentResponse)
 def update_student_patch(
-    student_id: int,
+    student_id: UUID,
     student_data: StudentUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
@@ -89,7 +89,7 @@ def update_student_patch(
 # endpoint to delete student 
 @router.delete("/{student_id}")
 def delete_student_route(
-    student_id: int,
+    student_id: UUID,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):

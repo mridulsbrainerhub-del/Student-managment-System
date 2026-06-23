@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field
-
+from uuid import UUID
 
 class StudentBase(BaseModel):
     name: str
@@ -32,12 +32,12 @@ class StudentUpdate(BaseModel):
     )
     age: int | None = None
     roll_number: str | None = None
-    class_id: int | None = None
+    class_id: UUID| None = None
     address: str | None = None
 
 
 class StudentResponse(StudentBase):
-    id: int
+    id: UUID
     created_at: datetime
 
     class Config:

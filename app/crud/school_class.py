@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
 from app.core.school_class import SchoolClass
@@ -24,13 +26,13 @@ def get_school_classes(db: Session):
     return db.query(SchoolClass).all()
 
 
-def get_school_class_by_id(db: Session, class_id: int):
+def get_school_class_by_id(db: Session, class_id: UUID):
     return db.query(SchoolClass).filter(SchoolClass.id == class_id).first()
 
 
 def update_school_class_full(
     db: Session,
-    class_id: int,
+    class_id: UUID,
     class_data: SchoolClassCreate
 ):
     school_class = get_school_class_by_id(db, class_id)
@@ -52,7 +54,7 @@ def update_school_class_full(
 
 def update_school_class_partial(
     db: Session,
-    class_id: int,
+    class_id: UUID,
     class_data: SchoolClassUpdate
 ):
     school_class = get_school_class_by_id(db, class_id)
@@ -74,7 +76,7 @@ def update_school_class_partial(
     return school_class
 
 
-def delete_school_class(db: Session, class_id: int):
+def delete_school_class(db: Session, class_id: UUID):
     school_class = get_school_class_by_id(db, class_id)
 
     if school_class is None:

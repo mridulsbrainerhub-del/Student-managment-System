@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
 from app.core.student import Student
@@ -26,13 +28,13 @@ def get_students(db: Session):
     return db.query(Student).all()
 
 
-def get_student_by_id(db: Session, student_id: int):
+def get_student_by_id(db: Session, student_id: UUID):
     return db.query(Student).filter(Student.id == student_id).first()
 
 
 def update_student_full(
     db: Session,
-    student_id: int,
+    student_id: UUID,
     student_data: StudentCreate
 ):
     student = get_student_by_id(db, student_id)
@@ -56,7 +58,7 @@ def update_student_full(
 
 def update_student_partial(
     db: Session,
-    student_id: int,
+    student_id: UUID,
     student_data: StudentUpdate
 ):
     student = get_student_by_id(db, student_id)
@@ -78,7 +80,7 @@ def update_student_partial(
     return student
 
 
-def delete_student(db: Session, student_id: int):
+def delete_student(db: Session, student_id: UUID):
     student = get_student_by_id(db, student_id)
 
     if student is None:

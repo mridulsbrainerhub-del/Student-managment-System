@@ -1,5 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Time
+import uuid
 from datetime import datetime
+
+from sqlalchemy import Column, String, DateTime, ForeignKey, Time
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.database.database import Base
 
@@ -7,10 +10,10 @@ from app.database.database import Base
 class Schedule(Base):
     __tablename__ = "schedules"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
-    class_id = Column(Integer, ForeignKey("classes.id"), nullable=False)
-    teacher_id = Column(Integer, ForeignKey("teachers.id"), nullable=False)
+    class_id = Column(UUID(as_uuid=True), ForeignKey("classes.id"), nullable=False)
+    teacher_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id"), nullable=False)
 
     subject = Column(String, nullable=False)
 
