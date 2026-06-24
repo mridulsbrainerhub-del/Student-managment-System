@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from app.core.schedule import Schedule
 from app.schema.schedule import ScheduleCreate, ScheduleUpdate
 
+from app.core.school_class import SchoolClass
+from app.core.teacher import Teacher
+
 
 def create_schedule(db: Session, schedule: ScheduleCreate):
     db_schedule = Schedule(
@@ -28,6 +31,35 @@ def get_schedules(db: Session):
 def get_schedule_by_id(db: Session, schedule_id: int):
     return db.query(Schedule).filter(Schedule.id == schedule_id).first()
 
+
+
+
+
+def get_schedules_by_class_and_day(
+    db: Session,
+    class_name: str,
+    section: str,
+    day: str
+):
+    return (
+        db.query(Schedule)
+        .join(SchoolClass, Schedule.class_id == SchoolClass.id)
+        .filter(
+            SchoolClass.name == class_name,
+            SchoolClass.section == section,
+            Schedule.day == day
+        )
+        .all()
+    )
+
+
+def get_schedules_by_teacher_email(db: Session, email: str):
+    return (
+        db.query(Schedule)
+        .join(Teacher, Schedule.teacher_id == Teacher.id)
+        .filter(Teacher.email == email)
+        .all()
+    )
 
 def update_schedule_full(
     db: Session,

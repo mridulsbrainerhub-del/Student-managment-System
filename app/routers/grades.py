@@ -17,7 +17,7 @@ from app.core.users import User
 
 # Change this import according to where your get_current_user function is written
 from app.core.auth import get_current_user
-
+from app.core.auth import require_roles
 
 router = APIRouter(
     prefix="/grades",
@@ -39,7 +39,7 @@ def teacher_required(current_user: User = Depends(get_current_user)):
 def add_grade(
     grade: GradeCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(teacher_required)
+    current_user: User = Depends(require_roles(["teacher","admin"]))
 ):
     return create_grade(db, grade)
 
@@ -90,7 +90,7 @@ def update_student_grade(
     grade_id: UUID,
     grade_data: GradeUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(teacher_required)
+    current_user: User = Depends(require_roles(["teacher","admin"]))
 ):
     updated_grade = update_grade(db, grade_id, grade_data)
 
@@ -107,7 +107,7 @@ def update_student_grade(
 def delete_student_grade(
     grade_id: UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(teacher_required)
+    current_user: User = Depends(require_roles(["teacher","admin"]))
 ):
     deleted_grade = delete_grade(db, grade_id)
 

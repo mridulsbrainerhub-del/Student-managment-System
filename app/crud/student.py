@@ -31,6 +31,10 @@ def get_students(db: Session):
 def get_student_by_id(db: Session, student_id: UUID):
     return db.query(Student).filter(Student.id == student_id).first()
 
+def get_student_by_email(db: Session, email: str):
+    return db.query(Student).filter(Student.email == email).first()
+
+
 
 def update_student_full(
     db: Session,

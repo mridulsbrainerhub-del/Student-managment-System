@@ -29,6 +29,8 @@ def get_teachers(db: Session):
 def get_teacher_by_id(db: Session, teacher_id: UUID):
     return db.query(Teacher).filter(Teacher.id == teacher_id).first()
 
+def get_teacher_by_email(db: Session, email: str):
+    return db.query(Teacher).filter(Teacher.email == email).first()
 
 def update_teacher_full(db: Session, teacher_id: UUID, teacher_data: TeacherCreate):
     teacher = get_teacher_by_id(db, teacher_id)

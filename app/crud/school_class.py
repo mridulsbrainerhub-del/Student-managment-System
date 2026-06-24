@@ -29,6 +29,15 @@ def get_school_classes(db: Session):
 def get_school_class_by_id(db: Session, class_id: UUID):
     return db.query(SchoolClass).filter(SchoolClass.id == class_id).first()
 
+def get_school_class_by_name_section(db: Session, name: str, section: str):
+    return (
+        db.query(SchoolClass)
+        .filter(
+            SchoolClass.name == name,
+            SchoolClass.section == section
+        )
+        .first()
+    )
 
 def update_school_class_full(
     db: Session,
