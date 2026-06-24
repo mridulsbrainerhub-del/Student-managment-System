@@ -9,7 +9,9 @@ from app.routers.teacher import router as teacher_router
 from app.routers.school_class import router as school_class_router
 from app.routers.schedule import router as schedule_router
 from app.routers.grades import router as grades_router
-Base.metadata.create_all(bind=engine)
+
+
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Study Buddy Club")
 

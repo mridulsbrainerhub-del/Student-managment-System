@@ -22,6 +22,9 @@ class Student(Base):
 
     class_id = Column(UUID(as_uuid=True), ForeignKey("classes.id"), nullable=True)
 
+    description = Column(String, nullable=True)
+
+
     address = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
