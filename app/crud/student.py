@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -14,8 +12,8 @@ def handle_student_integrity_error(error: IntegrityError):
 
     if "email" in message:
         detail = "Email already exists"
-    elif "roll_number" in message:
-        detail = "Roll number already exists"
+    elif "roll_number" in message or "uq_student_class_roll_number" in message:
+        detail = "Roll number already exists in this class"
     elif "foreign key" in message or "ForeignKeyViolation" in message:
         detail = "Class does not exist"
     else:
@@ -24,33 +22,35 @@ def handle_student_integrity_error(error: IntegrityError):
     raise HTTPException(status_code=400, detail=detail)
 
 
-def get_class_id_by_name(db: Session, class_name: str | None):
-    if class_name is None:
-        return None
-
+def get_class_by_name_and_section(db: Session, class_name: int, section: str):
     school_class = db.query(SchoolClass).filter(
-        SchoolClass.name == class_name
+        SchoolClass.name == class_name,
+        SchoolClass.section == section
     ).first()
 
     if school_class is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Class not found"
-        )
+        raise HTTPException(status_code=404, detail="Class not found")
 
-    return school_class.id
+    return school_class
 
 
 def create_student(db: Session, student: StudentCreate):
-    class_id = get_class_id_by_name(db, student.class_name)
+    school_class = get_class_by_name_and_section(
+        db,
+        student.class_name,
+        student.section
+    )
 
     db_student = Student(
-        name=student.name,
-        email=student.email,
-        phone=student.phone,
+        full_name=student.full_name,
         age=student.age,
+        gender=student.gender,
+        father_name=student.father_name,
+        dob=student.dob,
+        class_id=school_class.id,
+        mobile_number=student.mobile_number,
+        email=student.email,
         roll_number=student.roll_number,
-        class_id=class_id,
         address=student.address
     )
 
@@ -69,36 +69,56 @@ def get_students(db: Session):
     return db.query(Student).all()
 
 
-def get_student_by_id(db: Session, student_id: UUID):
-    return db.query(Student).filter(Student.id == student_id).first()
+def get_student_by_roll_class_section(
+    db: Session,
+    roll_number: int,
+    class_name: int,
+    section: str
+):
+    school_class = get_class_by_name_and_section(db, class_name, section)
+
+    return db.query(Student).filter(
+        Student.roll_number == roll_number,
+        Student.class_id == school_class.id
+    ).first()
 
 
 def get_student_by_email(db: Session, email: str):
     return db.query(Student).filter(Student.email == email).first()
 
 
-def get_student_by_roll_number(db: Session, roll_number: str):
-    return db.query(Student).filter(Student.roll_number == roll_number).first()
-
-
 def update_student_full(
     db: Session,
-    roll_number: str,
+    roll_number: int,
+    class_name: int,
+    section: str,
     student_data: StudentCreate
 ):
-    student = get_student_by_roll_number(db, roll_number)
+    student = get_student_by_roll_class_section(
+        db,
+        roll_number,
+        class_name,
+        section
+    )
 
     if student is None:
         return None
 
-    class_id = get_class_id_by_name(db, student_data.class_name)
+    new_class = get_class_by_name_and_section(
+        db,
+        student_data.class_name,
+        student_data.section
+    )
 
-    student.name = student_data.name
-    student.email = student_data.email
-    student.phone = student_data.phone
+    student.full_name = student_data.full_name
     student.age = student_data.age
+    student.gender = student_data.gender
+    student.father_name = student_data.father_name
+    student.dob = student_data.dob
+    student.class_id = new_class.id
+    student.mobile_number = student_data.mobile_number
+    student.email = student_data.email
     student.roll_number = student_data.roll_number
-    student.class_id = class_id
     student.address = student_data.address
 
     try:
@@ -112,19 +132,34 @@ def update_student_full(
 
 def update_student_partial(
     db: Session,
-    roll_number: str,
+    roll_number: int,
+    class_name: int,
+    section: str,
     student_data: StudentUpdate
 ):
-    student = get_student_by_roll_number(db, roll_number)
+    student = get_student_by_roll_class_section(
+        db,
+        roll_number,
+        class_name,
+        section
+    )
 
     if student is None:
         return None
 
     update_data = student_data.model_dump(exclude_unset=True)
 
-    if "class_name" in update_data:
-        class_name = update_data.pop("class_name")
-        student.class_id = get_class_id_by_name(db, class_name)
+    if "class_name" in update_data or "section" in update_data:
+        new_class_name = update_data.pop("class_name", class_name)
+        new_section = update_data.pop("section", section)
+
+        new_class = get_class_by_name_and_section(
+            db,
+            new_class_name,
+            new_section
+        )
+
+        student.class_id = new_class.id
 
     for key, value in update_data.items():
         setattr(student, key, value)
@@ -138,8 +173,18 @@ def update_student_partial(
         handle_student_integrity_error(error)
 
 
-def delete_student(db: Session, roll_number: str):
-    student = get_student_by_roll_number(db, roll_number)
+def delete_student(
+    db: Session,
+    roll_number: int,
+    class_name: int,
+    section: str
+):
+    student = get_student_by_roll_class_section(
+        db,
+        roll_number,
+        class_name,
+        section
+    )
 
     if student is None:
         return None
