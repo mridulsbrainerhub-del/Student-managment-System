@@ -1,15 +1,15 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SchoolClassBase(BaseModel):
-    name: str
-    section: str
+    name: int
+    section: str = Field(min_length=1, max_length=1)
     room_number: str | None = None
-    batch_year: str
-    incharge_teacher_id: UUID | None = None
+    batch_year: int
+    incharge_teacher_code: str | None = None
 
 
 class SchoolClassCreate(SchoolClassBase):
@@ -17,16 +17,26 @@ class SchoolClassCreate(SchoolClassBase):
 
 
 class SchoolClassUpdate(BaseModel):
-    name: str | None = None
-    section: str | None = None
+    name: int | None = None
+    section: str | None = Field(default=None, min_length=1, max_length=1)
     room_number: str | None = None
-    batch_year: str | None = None
-    incharge_teacher_id: UUID | None = None
+    batch_year: int | None = None
+    incharge_teacher_code: str | None = None
 
 
-class SchoolClassResponse(SchoolClassBase):
+class SchoolClassResponse(BaseModel):
     id: UUID
-    created_at: datetime
 
-    class Config:
-        from_attributes = True
+    name: int
+    section: str
+    room_number: str | None = None
+    batch_year: int
+
+    incharge_teacher_name: str | None = None
+    incharge_teacher_code: str | None = None
+    incharge_teacher_phone: str | None = None
+
+    total_students: int
+    subjects: list[str]
+
+    created_at: datetime
