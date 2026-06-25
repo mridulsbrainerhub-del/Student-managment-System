@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
@@ -9,7 +7,7 @@ from app.schema.teacher import TeacherCreate, TeacherUpdate, TeacherResponse
 from app.crud.teacher import (
     create_teacher,
     get_teachers,
-    get_teacher_by_id,
+    get_teacher_by_code,
     get_teacher_by_email,
     update_teacher_full,
     update_teacher_partial,
@@ -24,6 +22,23 @@ router = APIRouter(
 )
 
 
+def build_teacher_response(teacher):
+    return {
+        "id": teacher.id,
+        "teacher_code": teacher.teacher_code,
+        "name": teacher.name,
+        "age": teacher.age,
+        "gender": teacher.gender,
+        "father_name": teacher.father_name,
+        "dob": teacher.dob,
+        "mobile_number": teacher.mobile_number,
+        "email": teacher.email,
+        "department": teacher.department,
+        "subject_names": [subject.name for subject in teacher.subjects],
+        "created_at": teacher.created_at
+    }
+
+
 @router.post(
     "/",
     response_model=TeacherResponse,
@@ -34,7 +49,8 @@ def add_teacher(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    return create_teacher(db, teacher)
+    db_teacher = create_teacher(db, teacher)
+    return build_teacher_response(db_teacher)
 
 
 @router.get("/", response_model=list[TeacherResponse])
@@ -42,7 +58,8 @@ def read_teachers(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    return get_teachers(db)
+    teachers = get_teachers(db)
+    return [build_teacher_response(teacher) for teacher in teachers]
 
 
 @router.get("/by-email", response_model=TeacherResponse)
@@ -59,16 +76,16 @@ def read_teacher_by_email(
             detail="Teacher not found"
         )
 
-    return teacher
+    return build_teacher_response(teacher)
 
 
-@router.get("/{teacher_id}", response_model=TeacherResponse)
-def read_teacher(
-    teacher_id: UUID,
+@router.get("/code/{teacher_code}", response_model=TeacherResponse)
+def read_teacher_by_code(
+    teacher_code: str,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    teacher = get_teacher_by_id(db, teacher_id)
+    teacher = get_teacher_by_code(db, teacher_code)
 
     if teacher is None:
         raise HTTPException(
@@ -76,17 +93,21 @@ def read_teacher(
             detail="Teacher not found"
         )
 
-    return teacher
+    return build_teacher_response(teacher)
 
 
-@router.put("/{teacher_id}", response_model=TeacherResponse)
+@router.put("/code/{teacher_code}", response_model=TeacherResponse)
 def update_teacher_put(
-    teacher_id: UUID,
+    teacher_code: str,
     teacher_data: TeacherCreate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    updated_teacher = update_teacher_full(db, teacher_id, teacher_data)
+    updated_teacher = update_teacher_full(
+        db,
+        teacher_code,
+        teacher_data
+    )
 
     if updated_teacher is None:
         raise HTTPException(
@@ -94,12 +115,12 @@ def update_teacher_put(
             detail="Teacher not found"
         )
 
-    return updated_teacher
+    return build_teacher_response(updated_teacher)
 
 
-@router.patch("/{teacher_id}", response_model=TeacherResponse)
+@router.patch("/code/{teacher_code}", response_model=TeacherResponse)
 def update_teacher_patch(
-    teacher_id: UUID,
+    teacher_code: str,
     teacher_data: TeacherUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
@@ -112,7 +133,11 @@ def update_teacher_patch(
             detail="No data provided for update"
         )
 
-    updated_teacher = update_teacher_partial(db, teacher_id, teacher_data)
+    updated_teacher = update_teacher_partial(
+        db,
+        teacher_code,
+        teacher_data
+    )
 
     if updated_teacher is None:
         raise HTTPException(
@@ -120,16 +145,16 @@ def update_teacher_patch(
             detail="Teacher not found"
         )
 
-    return updated_teacher
+    return build_teacher_response(updated_teacher)
 
 
-@router.delete("/{teacher_id}", status_code=status.HTTP_200_OK)
+@router.delete("/code/{teacher_code}", status_code=status.HTTP_200_OK)
 def delete_teacher_route(
-    teacher_id: UUID,
+    teacher_code: str,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    deleted_teacher = delete_teacher(db, teacher_id)
+    deleted_teacher = delete_teacher(db, teacher_code)
 
     if deleted_teacher is None:
         raise HTTPException(
