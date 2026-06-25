@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.database.database import Base, engine
-from app.core import student,users,teacher,school_class,schedule,grades
+from app.core import student,users,teacher,school_class,schedule,grades,subjects,subject_overview
 
 from app.routers.student import router as student_router
 from app.routers.auth import router as auth_router
@@ -9,6 +9,10 @@ from app.routers.teacher import router as teacher_router
 from app.routers.school_class import router as school_class_router
 from app.routers.schedule import router as schedule_router
 from app.routers.grades import router as grades_router
+from app.routers.subjects import router as subject_router
+
+
+
 
 
 # Base.metadata.create_all(bind=engine)
@@ -22,6 +26,9 @@ app.include_router(teacher_router)
 app.include_router(schedule_router)
 app.include_router(school_class_router)
 app.include_router(grades_router)
+app.include_router(subject_router)
+
+
 
 @app.get("/")
 def home():

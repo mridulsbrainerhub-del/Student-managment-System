@@ -1,19 +1,29 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
+from typing import Literal
+
+from pydantic import BaseModel, EmailStr, Field
+
 
 class StudentBase(BaseModel):
-    name: str
-    email: EmailStr
-    phone: str | None = Field(
-        default=None,
+    full_name: str
+    age: int
+    gender: Literal["male", "female", "other"]
+
+    father_name: str
+    dob: str
+
+    class_name:str
+
+    mobile_number: str = Field(
         min_length=10,
         max_length=10,
         pattern=r"^\d+$"
     )
-    age: int
-    roll_number: str
-    class_id: int | None = None
+
+    email: EmailStr
+    roll_number: int
+
     address: str | None = None
 
 
@@ -22,17 +32,25 @@ class StudentCreate(StudentBase):
 
 
 class StudentUpdate(BaseModel):
-    name: str | None = None
-    email: EmailStr | None = None
-    phone: str | None = Field(
+    full_name: str | None = None
+    age: int | None = None
+    gender: Literal["male", "female", "other"] | None = None
+
+    father_name: str | None = None
+    dob: str | None = None
+
+    class_name: str | None=None
+
+    mobile_number: str | None = Field(
         default=None,
         min_length=10,
         max_length=10,
         pattern=r"^\d+$"
     )
-    age: int | None = None
-    roll_number: str | None = None
-    class_id: UUID| None = None
+
+    email: EmailStr | None = None
+    roll_number: int | None = None
+
     address: str | None = None
 
 

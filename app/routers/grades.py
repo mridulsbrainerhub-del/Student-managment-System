@@ -12,12 +12,9 @@ from app.crud.grades import (
     update_grade,
     delete_grade
 )
-
 from app.core.users import User
-
-# Change this import according to where your get_current_user function is written
-from app.core.auth import get_current_user
 from app.core.auth import require_roles
+
 
 router = APIRouter(
     prefix="/grades",
@@ -25,39 +22,13 @@ router = APIRouter(
 )
 
 
-def teacher_required(current_user: User = Depends(get_current_user)):
-    if current_user.role != "teacher":
-        raise HTTPException(
-            status_code=403,
-            detail="Only teachers can perform this action"
-        )
-
-    return current_user
-
-
 @router.post("/", response_model=GradeResponse)
 def add_grade(
     grade: GradeCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles(["teacher","admin"]))
+    current_user: User = Depends(require_roles(["teacher", "admin"]))
 ):
     return create_grade(db, grade)
-
-
-@router.get("/{grade_id}", response_model=GradeResponse)
-def get_single_grade(
-    grade_id: UUID,
-    db: Session = Depends(get_db)
-):
-    grade = get_grade_by_id(db, grade_id)
-
-    if not grade:
-        raise HTTPException(
-            status_code=404,
-            detail="Grade not found"
-        )
-
-    return grade
 
 
 @router.get("/student/by-email/{email}")
@@ -85,12 +56,28 @@ def get_student_grades(
     }
 
 
+@router.get("/{grade_id}", response_model=GradeResponse)
+def get_single_grade(
+    grade_id: UUID,
+    db: Session = Depends(get_db)
+):
+    grade = get_grade_by_id(db, grade_id)
+
+    if not grade:
+        raise HTTPException(
+            status_code=404,
+            detail="Grade not found"
+        )
+
+    return grade
+
+
 @router.put("/{grade_id}", response_model=GradeResponse)
 def update_student_grade(
     grade_id: UUID,
     grade_data: GradeUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles(["teacher","admin"]))
+    current_user: User = Depends(require_roles(["teacher", "admin"]))
 ):
     updated_grade = update_grade(db, grade_id, grade_data)
 
@@ -107,7 +94,7 @@ def update_student_grade(
 def delete_student_grade(
     grade_id: UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles(["teacher","admin"]))
+    current_user: User = Depends(require_roles(["teacher", "admin"]))
 ):
     deleted_grade = delete_grade(db, grade_id)
 

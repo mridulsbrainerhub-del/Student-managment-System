@@ -16,7 +16,6 @@ from app.crud.schedule import (
     update_schedule_partial,
     delete_schedule
 )
-from app.core.auth import get_current_user
 from app.core.auth import require_roles
 
 
@@ -30,7 +29,7 @@ router = APIRouter(
 def add_schedule(
     schedule: ScheduleCreate,
     db: Session = Depends(get_db),
-    current_user=Depends(require_roles(["teacher","admin"]))
+    current_user=Depends(require_roles(["teacher", "admin"]))
 ):
     return create_schedule(db, schedule)
 
@@ -38,7 +37,7 @@ def add_schedule(
 @router.get("/", response_model=list[ScheduleResponse])
 def read_schedules(
     db: Session = Depends(get_db),
-    current_user=Depends(require_roles(["teacher","admin"]))
+    current_user=Depends(require_roles(["teacher", "admin"]))
 ):
     return get_schedules(db)
 
@@ -47,7 +46,7 @@ def read_schedules(
 def read_schedule(
     schedule_id: UUID,
     db: Session = Depends(get_db),
-    current_user=Depends(require_roles(["teacher","admin"]))
+    current_user=Depends(require_roles(["teacher", "admin"]))
 ):
     schedule = get_schedule_by_id(db, schedule_id)
 

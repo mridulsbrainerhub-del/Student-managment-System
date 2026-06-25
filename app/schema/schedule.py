@@ -1,10 +1,12 @@
 from datetime import datetime, time
-from pydantic import BaseModel
 from uuid import UUID
 
+from pydantic import BaseModel
+
+
 class ScheduleBase(BaseModel):
-    class_id: int
-    teacher_id: int
+    class_id: UUID
+    teacher_id: UUID
     subject: str
     day: str
     start_time: time
@@ -16,8 +18,8 @@ class ScheduleCreate(ScheduleBase):
 
 
 class ScheduleUpdate(BaseModel):
-    class_id: int | None = None
-    teacher_id: int | None = None
+    class_id: UUID | None = None
+    teacher_id: UUID | None = None
     subject: str | None = None
     day: str | None = None
     start_time: time | None = None

@@ -13,11 +13,10 @@ class Schedule(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
     class_id = Column(UUID(as_uuid=True), ForeignKey("classes.id"), nullable=False)
+    subject_id = Column(UUID(as_uuid=True), ForeignKey("subjects.id"), nullable=False)
     teacher_id = Column(UUID(as_uuid=True), ForeignKey("teachers.id"), nullable=False)
 
-    subject = Column(String, nullable=False)
-
-    day = Column(String, nullable=False)  # Monday, Tuesday, etc.
+    day = Column(String, nullable=False)
 
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)

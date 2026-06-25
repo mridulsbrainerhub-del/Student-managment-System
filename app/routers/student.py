@@ -11,6 +11,7 @@ from app.crud.student import (
     get_students,
     get_student_by_id,
     get_student_by_email,
+    get_student_by_roll_number,
     update_student_full,
     update_student_partial,
     delete_student
@@ -62,13 +63,13 @@ def read_student_by_email(
     return student
 
 
-@router.get("/{student_id}", response_model=StudentResponse)
-def read_student(
-    student_id: UUID,
+@router.get("/by-roll-number", response_model=StudentResponse)
+def read_student_by_roll_number(
+    roll_number: str = Query(...),
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    student = get_student_by_id(db, student_id)
+    student = get_student_by_roll_number(db, roll_number)
 
     if student is None:
         raise HTTPException(
@@ -79,14 +80,31 @@ def read_student(
     return student
 
 
-@router.put("/{student_id}", response_model=StudentResponse)
+# @router.get("/{student_id}", response_model=StudentResponse)
+# def read_student(
+#     student_id: UUID,
+#     db: Session = Depends(get_db),
+#     current_user=Depends(get_current_user)
+# ):
+#     student = get_student_by_id(db, student_id)
+
+#     if student is None:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Student not found"
+#         )
+
+#     return student
+
+
+@router.put("/roll-number/{roll_number}", response_model=StudentResponse)
 def update_student_put(
-    student_id: UUID,
+    roll_number: str,
     student_data: StudentCreate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    updated_student = update_student_full(db, student_id, student_data)
+    updated_student = update_student_full(db, roll_number, student_data)
 
     if updated_student is None:
         raise HTTPException(
@@ -97,9 +115,9 @@ def update_student_put(
     return updated_student
 
 
-@router.patch("/{student_id}", response_model=StudentResponse)
+@router.patch("/roll-number/{roll_number}", response_model=StudentResponse)
 def update_student_patch(
-    student_id: UUID,
+    roll_number: str,
     student_data: StudentUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
@@ -112,7 +130,7 @@ def update_student_patch(
             detail="No data provided for update"
         )
 
-    updated_student = update_student_partial(db, student_id, student_data)
+    updated_student = update_student_partial(db, roll_number, student_data)
 
     if updated_student is None:
         raise HTTPException(
@@ -123,13 +141,13 @@ def update_student_patch(
     return updated_student
 
 
-@router.delete("/{student_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{roll_number}", status_code=status.HTTP_200_OK)
 def delete_student_route(
-    student_id: UUID,
+    roll_number: str,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    deleted_student = delete_student(db, student_id)
+    deleted_student = delete_student(db, roll_number)
 
     if deleted_student is None:
         raise HTTPException(
