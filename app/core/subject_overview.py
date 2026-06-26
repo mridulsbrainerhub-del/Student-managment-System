@@ -40,6 +40,6 @@ class SubjectOverview(Base):
     )
 
     subject = relationship(
-        "Subject",
-        back_populates="overview"
-    )
+    "Subject",
+    back_populates="overviews"
+)

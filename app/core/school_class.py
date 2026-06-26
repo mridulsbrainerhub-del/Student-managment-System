@@ -12,10 +12,20 @@ class SchoolClass(Base):
     __tablename__ = "classes"
 
     __table_args__ = (
-        UniqueConstraint("name", "section", "batch_year", name="uq_class_section_batch"),
+        UniqueConstraint(
+            "name",
+            "section",
+            "batch_year",
+            name="uq_class_section_batch"
+        ),
     )
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True
+    )
 
     name = Column(Integer, nullable=False)  # 10, 11, 12
     section = Column(String(1), nullable=False)  # A, B, C
@@ -38,6 +48,12 @@ class SchoolClass(Base):
 
     subjects = relationship(
         "Subject",
+        back_populates="school_class",
+        cascade="all, delete-orphan"
+    )
+
+    schedules = relationship(
+        "Schedule",
         back_populates="school_class",
         cascade="all, delete-orphan"
     )

@@ -77,16 +77,30 @@ class Subject(Base):
         back_populates="subjects"
     )
 
-    # One subject can have many teachers
-    # One teacher can have many subjects
+    # Many-to-many: one teacher can teach many subjects,
+    # and one subject can be taught by many teachers
     teachers = relationship(
         "Teacher",
         secondary=teacher_subjects,
         back_populates="subjects"
     )
 
-    # Subject can have overview/details
-    overview = relationship(
+    # One subject can have many grade records
+    grades = relationship(
+        "Grade",
+        back_populates="subject",
+        cascade="all, delete-orphan"
+    )
+
+    # One subject can appear in many schedule records
+    schedules = relationship(
+        "Schedule",
+        back_populates="subject",
+        cascade="all, delete-orphan"
+    )
+
+    # One subject can have many overview/detail records
+    overviews = relationship(
         "SubjectOverview",
         back_populates="subject",
         cascade="all, delete-orphan"

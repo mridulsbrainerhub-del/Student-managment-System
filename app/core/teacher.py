@@ -12,9 +12,19 @@ from app.core.subjects import teacher_subjects
 class Teacher(Base):
     __tablename__ = "teachers"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True
+    )
 
-    teacher_code = Column(String, unique=True, index=True, nullable=False)
+    teacher_code = Column(
+        String,
+        unique=True,
+        index=True,
+        nullable=False
+    )
 
     name = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
@@ -39,4 +49,10 @@ class Teacher(Base):
     incharge_classes = relationship(
         "SchoolClass",
         back_populates="incharge_teacher"
+    )
+
+    schedules = relationship(
+        "Schedule",
+        back_populates="teacher",
+        cascade="all, delete-orphan"
     )

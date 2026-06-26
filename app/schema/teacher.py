@@ -7,9 +7,11 @@ from pydantic import BaseModel, EmailStr, Field
 
 class TeacherBase(BaseModel):
     teacher_code: str
+
     name: str
     age: int
     gender: Literal["male", "female", "other"]
+
     father_name: str
     dob: str
 
@@ -22,6 +24,8 @@ class TeacherBase(BaseModel):
     email: EmailStr
     department: str | None = None
 
+    subject_names: list[str] = []
+
 
 class TeacherCreate(TeacherBase):
     pass
@@ -29,9 +33,11 @@ class TeacherCreate(TeacherBase):
 
 class TeacherUpdate(BaseModel):
     teacher_code: str | None = None
+
     name: str | None = None
     age: int | None = None
-    gender: Literal["male", "female", "other"] | None=None
+    gender: Literal["male", "female", "other"] | None = None
+
     father_name: str | None = None
     dob: str | None = None
 
@@ -45,10 +51,24 @@ class TeacherUpdate(BaseModel):
     email: EmailStr | None = None
     department: str | None = None
 
+    subject_names: list[str] | None = None
 
-class TeacherResponse(TeacherBase):
+
+class TeacherResponse(BaseModel):
     id: UUID
-    created_at: datetime
+    teacher_code: str
 
-    class Config:
-        from_attributes = True
+    name: str
+    age: int
+    gender: str
+
+    father_name: str
+    dob: str
+
+    mobile_number: str
+    email: EmailStr
+    department: str | None = None
+
+    subject_names: list[str]
+
+    created_at: datetime
