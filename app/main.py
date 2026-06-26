@@ -15,9 +15,12 @@ from app.routers.subjects import router as subject_router
 
 
 
-# Base.metadata.create_all(bind=engine)
-
-app = FastAPI(title="Study Buddy Club")
+app = FastAPI(
+    title="Study Buddy Club",
+    swagger_ui_parameters={
+        "persistAuthorization": True
+    }
+)
 
 
 app.include_router(auth_router)

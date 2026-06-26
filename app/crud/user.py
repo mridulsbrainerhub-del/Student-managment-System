@@ -17,6 +17,7 @@ def handle_user_integrity_error(error: IntegrityError):
     else:
         detail = "Invalid user data"
 
+
     raise HTTPException(
         status_code=400,
         detail=detail

@@ -3,19 +3,21 @@ from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
 
+from app.core.users import UserRole
+
 
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
-    role: str = "student"
+    role: UserRole = UserRole.student
 
 
 class UserResponse(BaseModel):
     id: UUID
     name: str
     email: EmailStr
-    role: str
+    role: UserRole
     created_at: datetime
 
     class Config:
