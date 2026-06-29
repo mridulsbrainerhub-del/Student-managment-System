@@ -13,26 +13,65 @@ from app.database.database import get_db
 
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
+
 ACCESS_TOKEN_EXPIRE_MINUTES = 1
+REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto"
+)
 
 
 def hash_password(password: str):
     return pwd_context.hash(password)
 
 
-def verify_password(plain_password: str, hashed_password: str):
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(
+    plain_password: str,
+    hashed_password: str
+):
+    return pwd_context.verify(
+        plain_password,
+        hashed_password
+    )
 
 
 def create_access_token(data: dict):
+
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    )
 
-    to_encode.update({"exp": expire})
+    to_encode.update({
+        "exp": expire,
+        "type": "access"
+    })
+
+    encoded_jwt = jwt.encode(
+        to_encode,
+        SECRET_KEY,
+        algorithm=ALGORITHM
+    )
+
+    return encoded_jwt
+
+
+def create_refresh_token(data: dict):
+
+    to_encode = data.copy()
+
+    expire = datetime.utcnow() + timedelta(
+        days=REFRESH_TOKEN_EXPIRE_DAYS
+    )
+
+    to_encode.update({
+        "exp": expire,
+        "type": "refresh"
+    })
 
     encoded_jwt = jwt.encode(
         to_encode,
@@ -55,13 +94,20 @@ def get_current_user(
     token = credentials.credentials
 
     try:
+
         payload = jwt.decode(
             token,
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
 
-        email: str = payload.get("sub")
+        if payload.get("type") != "access":
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid access token"
+            )
+
+        email = payload.get("sub")
 
         if email is None:
             raise HTTPException(
@@ -92,8 +138,43 @@ def get_current_user(
     return user
 
 
+def verify_refresh_token(token: str):
+
+    try:
+
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        if payload.get("type") != "refresh":
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid refresh token"
+            )
+
+        return payload
+
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=401,
+            detail="Refresh token has expired"
+        )
+
+    except JWTError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid refresh token"
+        )
+
+
 def require_roles(allowed_roles: list[str]):
-    def role_checker(current_user=Depends(get_current_user)):
+
+    def role_checker(
+        current_user=Depends(get_current_user)
+    ):
+
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=403,
